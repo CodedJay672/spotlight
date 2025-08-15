@@ -1,15 +1,23 @@
 import { StatusBar } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { ClerkProvider } from "@clerk/clerk-expo";
+import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import Root from "@/components/Root";
 import "./globals.css";
 
 export default function RootLayout() {
+  const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  if (!publishableKey) throw new Error(" publishableKey is not set.");
+
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
-        <StatusBar backgroundColor="white" />
-        <Root />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
+      <SafeAreaProvider>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
+          <StatusBar backgroundColor="black" />
+          <Root />
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </ClerkProvider>
   );
 }
