@@ -2,8 +2,9 @@ import { StatusBar } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ClerkLoaded, ClerkProvider } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
-import InitialRootLayout from "@/components/InitialRootLayout";
 import "./globals.css";
+import { Stack } from "expo-router";
+import InitialRootLayout from "@/components/InitialRootLayout";
 
 export default function RootLayout() {
   const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
