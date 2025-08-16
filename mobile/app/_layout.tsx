@@ -1,8 +1,8 @@
 import { StatusBar } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { ClerkProvider } from "@clerk/clerk-expo";
+import { ClerkLoaded, ClerkProvider } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
-import Root from "@/components/Root";
+import InitialRootLayout from "@/components/InitialRootLayout";
 import "./globals.css";
 
 export default function RootLayout() {
@@ -12,12 +12,13 @@ export default function RootLayout() {
 
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
-      <SafeAreaProvider>
-        <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
-          <StatusBar backgroundColor="black" />
-          <Root />
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <ClerkLoaded>
+        <SafeAreaProvider>
+          <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
+            <InitialRootLayout />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </ClerkLoaded>
     </ClerkProvider>
   );
 }

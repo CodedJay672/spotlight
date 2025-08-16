@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { SplashScreen, Stack, useRouter, useSegments } from "expo-router";
 import { useAuth } from "@clerk/clerk-expo";
 
-const Root = () => {
+const InitialRootLayout = () => {
   const { isLoaded, isSignedIn } = useAuth();
   const router = useRouter();
   const segment = useSegments();
@@ -12,12 +12,10 @@ const Root = () => {
     const authScreen = segment[0] === "(auth)";
 
     if (isSignedIn && authScreen) router.replace("/(tabs)");
-    else if (isSignedIn && !authScreen) router.replace("/(auth)/login");
+    else if (!isSignedIn && !authScreen) router.replace("/(auth)/login");
   }, [segment, isLoaded, isSignedIn]);
-
-  if (!isLoaded) return null;
 
   return <Stack screenOptions={{ headerShown: false }} />;
 };
 
-export default Root;
+export default InitialRootLayout;
