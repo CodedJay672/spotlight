@@ -11,17 +11,18 @@ import {
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey(),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
   email: text("email").unique(),
+  clerkId: text("clerk_id").unique(),
   phone: varchar("phone", { length: 20 }),
   userName: varchar("username", { length: 50 }).unique().notNull(),
   displayName: varchar("display_name", { length: 150 }),
   bio: text("bio"),
   imgUrl: text("imgUrl"),
   location: text("location"),
-  isPrivate: boolean("is_private"),
-  isVerified: boolean("is_verified"),
+  isPrivate: boolean("is_private").default(false),
+  isVerified: boolean("is_verified").default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
