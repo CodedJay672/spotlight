@@ -39,7 +39,7 @@ export const createNewUser = async (req: Request, res: Response) => {
         firstName: first_name!,
         lastName: last_name!,
         email: email_addresses?.[0].email_address,
-        phone: phone_numbers?.[0].phone_number!,
+        phone: "",
         userName: `${username}`,
         imgUrl: image_url,
         displayName: first_name,

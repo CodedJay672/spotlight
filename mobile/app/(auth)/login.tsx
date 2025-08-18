@@ -55,8 +55,8 @@ const SignIn = () => {
           </Text>
         </TouchableOpacity>
 
-        <Text className="text-xs text-gray-400 text-center">
-          By continuing you agree to out T&Cs
+        <Text className="text-xs text-gray-400 text-center mt-3">
+          By continuing you agree to our T&Cs
         </Text>
       </View>
     </View>

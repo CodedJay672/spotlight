@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import helmet, { xFrameOptions } from "helmet";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import { clerkMiddleware } from "@clerk/express";
