@@ -1,4 +1,3 @@
-import { error } from "console";
 import rateLimit from "express-rate-limit";
 
 const limiter = rateLimit({
@@ -6,6 +5,7 @@ const limiter = rateLimit({
   limit: 60,
   standardHeaders: "draft-8",
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: {
     error: "Too many requests.",
   },

@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
-import helmet from "helmet";
+import helmet, { xFrameOptions } from "helmet";
 import cookieParser from "cookie-parser";
 import compression from "compression";
-import { clerkMiddleware, createClerkClient } from "@clerk/express";
+import { clerkMiddleware } from "@clerk/express";
 
 //custom module
 import { config } from "./lib/config/index";
@@ -12,6 +12,7 @@ import limiter from "./lib/config/ratelimiterconfig";
 
 //routes
 import authRouter from "./routes/webhook";
+import { validateHeaderValue } from "node:http";
 
 // initialize the app
 const app = express();
@@ -29,7 +30,7 @@ app.use(limiter);
 
 (async () => {
   try {
-    app.use("/api", authRouter);
+    app.use("/api/auth", authRouter);
 
     app.listen(config.port, () => {
       console.log("server is running on port", config.port);
