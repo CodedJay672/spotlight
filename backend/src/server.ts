@@ -12,7 +12,6 @@ import limiter from "./lib/config/ratelimiterconfig";
 
 //routes
 import authRouter from "./routes/webhook";
-import { validateHeaderValue } from "node:http";
 
 // initialize the app
 const app = express();

@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { Request, Response } from "express";
+import { v4 as uuidv4 } from "uuid";
 import { UserJSON } from "@clerk/express";
 import { verifyWebhook } from "@clerk/express/webhooks";
-import { v4 as uuidv4 } from "uuid";
 
 import { db } from "../db/config";
 import { users } from "../db/schema";
@@ -11,7 +11,6 @@ import { config } from "../lib/config";
 export const createNewUser = async (req: Request, res: Response) => {
   try {
     const evt = await verifyWebhook(req);
-
     if (!evt) res.status(500).send("Error verifying webhook");
 
     const {
@@ -37,13 +36,13 @@ export const createNewUser = async (req: Request, res: Response) => {
       .values({
         id: uuidv4(),
         clerkId: id,
-        firstName: first_name ?? "John",
-        lastName: last_name ?? "Doe",
-        email: "test@email.com",
-        phone: "12346789012",
-        userName: "John Doe",
-        imgUrl: image_url ?? "testimage.com",
-        displayName: first_name ?? "John",
+        firstName: first_name!,
+        lastName: last_name!,
+        email: email_addresses?.[0].email_address,
+        phone: phone_numbers?.[0].phone_number!,
+        userName: `${username}`,
+        imgUrl: image_url,
+        displayName: first_name,
       })
       .returning();
 
