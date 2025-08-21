@@ -10,6 +10,7 @@ const TabsLayout = () => {
         tabBarShowLabel: false,
         tabBarStyle: {
           backgroundColor: "black",
+          borderColor: "black",
           width: "100%",
           height: 20,
           paddingTop: 6,
