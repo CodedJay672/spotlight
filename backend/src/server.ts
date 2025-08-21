@@ -18,24 +18,16 @@ const app = express();
 
 //load useful middleware
 app.use(cors(corsOptions));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded());
 app.use(helmet());
 app.use(cookieParser());
 app.use(compression({ threshold: 1024 }));
 app.use(clerkMiddleware());
-
-//rate limiting middleware
 app.use(limiter);
 
-(async () => {
-  try {
-    app.use("/api/auth", authRouter);
+// api endpoints
+app.use("/api/auth", authRouter);
 
-    app.listen(config.port, () => {
-      console.log("server is running on port", config.port);
-    });
-  } catch (error) {
-    console.log("Failed to start server");
-    if (config.node_env === "production") process.exit(1);
-  }
-})();
+app.listen(config.port, () => {
+  console.log("server is running on port", config.port);
+});

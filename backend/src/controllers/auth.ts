@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { UserJSON } from "@clerk/express";
 import { verifyWebhook } from "@clerk/express/webhooks";
