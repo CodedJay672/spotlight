@@ -13,15 +13,8 @@ export const createNewUser = async (req: Request, res: Response) => {
     const evt = await verifyWebhook(req);
     if (!evt) res.status(500).send("Error verifying webhook");
 
-    const {
-      id,
-      email_addresses,
-      first_name,
-      last_name,
-      image_url,
-      phone_numbers,
-      username,
-    } = evt.data as UserJSON;
+    const { id, email_addresses, first_name, last_name, image_url, username } =
+      evt.data as UserJSON;
 
     // check if the user already exists
     const isCreated = await db
@@ -52,6 +45,6 @@ export const createNewUser = async (req: Request, res: Response) => {
     return res.status(201).json({ message: "Sign in success." });
   } catch (err) {
     console.error("Error verifying webhook:", err);
-    return res.status(400).send("Error verifying webhook");
+    return res.status(500).send("Internal server error");
   }
 };

@@ -1,27 +1,38 @@
+import { useUser } from "@clerk/clerk-expo";
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useState } from "react";
-import { useUser } from "@clerk/clerk-expo";
-import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import { Image } from "expo-image";
+import { createPost } from "@/lib/actions/post.action";
 
 const Create = () => {
   const { user } = useUser();
   const router = useRouter();
   const [isSharing, setIsSharing] = useState(false);
+  const [content, setContent] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>("");
 
+  // select the image
   const handleSelectImage = useCallback(async () => {
+    //get image library permission
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Spotlight needs permission to access your library");
+      return;
+    }
+
     const image = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: "images",
       allowsEditing: true,
@@ -31,6 +42,44 @@ const Create = () => {
 
     if (!image.canceled) setSelectedImage(image.assets[0].uri);
   }, [selectedImage]);
+
+  const handleCreatePost = async () => {
+    let formData = new FormData();
+    formData.append("caption", content);
+    formData.append("userId", user?.id ?? "");
+
+    if (selectedImage) {
+      const filename = selectedImage.split("/").pop() || "photo.jpg";
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : `image`;
+
+      formData.append("image", {
+        uri: selectedImage,
+        name: filename,
+        type,
+      } as any);
+    }
+    try {
+      //loading state
+      setIsSharing(true);
+
+      //begin the product creation
+      const newPost = await createPost(formData);
+
+      if (!newPost) {
+        Alert.alert("Failed.");
+        return;
+      }
+
+      setContent("");
+      setSelectedImage("");
+      router.replace("/(tabs)");
+    } catch (error: any) {
+      Alert.alert("Failed to create post.", error.message);
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   if (!selectedImage) {
     return (
@@ -84,13 +133,13 @@ const Create = () => {
 
         <TouchableOpacity
           disabled={isSharing || !selectedImage}
-          onPress={() => setIsSharing((prev) => !prev)}
+          onPress={handleCreatePost}
           className="w-16 justify-center items-center"
         >
           {isSharing ? (
             <ActivityIndicator size={20} color="gray" />
           ) : (
-            <Text className="text-base text-green-600 font-semibold align-middle">
+            <Text className="text-base text-green-700 font-bold align-middle">
               Share
             </Text>
           )}
@@ -116,6 +165,7 @@ const Create = () => {
           />
           <TouchableOpacity
             onPress={handleSelectImage}
+            disabled={isSharing}
             className="px-3 py-2 bg-gray-900 rounded-full absolute right-2 bottom-2"
           >
             <View className="justify-center items-center gap-1 flex-row">
@@ -124,11 +174,31 @@ const Create = () => {
             </View>
           </TouchableOpacity>
         </View>
+
+        <View className="flex flex-row gap-4 mt-4 p-2">
+          <View className="size-14 rounded-full flex justify-center items-center">
+            <Image
+              source={user?.imageUrl}
+              alt={user?.fullName ?? "user"}
+              transition={100}
+              contentFit="cover"
+              style={{ width: "100%", height: "100%" }}
+            />
+          </View>
+          <TextInput
+            value={content}
+            onChangeText={setContent}
+            keyboardType="default"
+            placeholder="What is happening?"
+            placeholderTextColor="#6b7280"
+            editable={!isSharing}
+            multiline
+            className="flex-1 bg-gray-900 text-gray-50 p-2 px-5 rounded-lg"
+          />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
 export default Create;
-
-const styles = StyleSheet.create({});

@@ -38,7 +38,7 @@ const TabsLayout = () => {
         name="create"
         options={{
           tabBarIcon: ({ size, color }) => (
-            <Ionicons name="add-circle" size={size} color="green" />
+            <Ionicons name="add-circle" size={size} color="#15803d" />
           ),
         }}
       />
