@@ -21,10 +21,6 @@ router.post(
         errorMessage: "caption too long.",
       },
     },
-    userId: {
-      notEmpty: true,
-      errorMessage: "user must have a valid clerk id",
-    },
   }),
   (req: Request, res: Response, next: NextFunction) => {
     const result = validationResult(req);

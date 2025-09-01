@@ -1,4 +1,4 @@
-export const createPost = async (postInfo: FormData) => {
+export const createPost = async (postInfo: FormData, token: string) => {
   try {
     const response = await fetch(
       `${process.env.EXPO_PUBLIC_BASE_URL}/post/create`,
@@ -6,6 +6,7 @@ export const createPost = async (postInfo: FormData) => {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
         body: postInfo,
       }

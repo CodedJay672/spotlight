@@ -1,7 +1,7 @@
 import React from "react";
 import { useSSO } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
-import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const SignIn = () => {

@@ -11,4 +11,5 @@ export const config = {
   clerk_pub_key: process.env.CLERK_PUBLISHABLE_KEY,
   clerk_secret: process.env.CLERK_SECRET_KEY,
   clerk_wh_secret: process.env.CLERK_WEBHOOK_SIGNING_SECRET,
+  jwtAccessSecret: process.env.JWT_ACCESS_SECRET,
 };

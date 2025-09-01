@@ -22,8 +22,8 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(cookieParser());
-app.use(compression({ threshold: 1024 }));
 app.use(clerkMiddleware());
+app.use(compression({ threshold: 1024 }));
 app.use(express.json());
 app.use(limiter);
 

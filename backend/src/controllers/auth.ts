@@ -21,7 +21,12 @@ export const createNewUser = async (req: Request, res: Response) => {
       .select({ id: users.id, clerkId: users.clerkId })
       .from(users)
       .where(eq(users.clerkId, id));
-    if (isCreated.length > 0) return;
+
+    if (isCreated.length > 0)
+      res.status(200).json({
+        success: true,
+        message: "logged in",
+      });
 
     // create the row in the DB
     const user = await db
@@ -42,9 +47,9 @@ export const createNewUser = async (req: Request, res: Response) => {
     // see the created user record
     if (config.node_env === "development") console.log(user);
 
-    return res.status(201).json({ message: "Sign in success." });
+    res.status(201).json({ success: true, message: "Sign up successfully." });
   } catch (err) {
     console.error("Error verifying webhook:", err);
-    return res.status(500).send("Internal server error");
+    res.status(500).send("Internal server error");
   }
 };

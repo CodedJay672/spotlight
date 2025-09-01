@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
@@ -18,6 +18,7 @@ import {
 import { createPost } from "@/lib/actions/post.action";
 
 const Create = () => {
+  const { isSignedIn, getToken } = useAuth();
   const { user } = useUser();
   const router = useRouter();
   const [isSharing, setIsSharing] = useState(false);
@@ -44,6 +45,10 @@ const Create = () => {
   }, [selectedImage]);
 
   const handleCreatePost = async () => {
+    // veify the signed in user
+    if (!isSignedIn) router.replace("/(auth)/login");
+
+    //create the formdata for the post content and image
     let formData = new FormData();
     formData.append("caption", content);
     formData.append("userId", user?.id ?? "");
@@ -63,8 +68,10 @@ const Create = () => {
       //loading state
       setIsSharing(true);
 
+      const token = await getToken();
+
       //begin the product creation
-      const newPost = await createPost(formData);
+      const newPost = await createPost(formData, token!);
 
       if (!newPost) {
         Alert.alert("Failed.");
