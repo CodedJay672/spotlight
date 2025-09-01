@@ -29,7 +29,6 @@ export async function verifyUser(
         success: false,
         message: "user not found.",
       });
-
     req.id = user[0].id;
     next();
   } catch (error) {

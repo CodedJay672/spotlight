@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response, Router } from "express";
+import express, { NextFunction, Request, Response, Router } from "express";
 import { checkSchema, validationResult } from "express-validator";
 import multer from "multer";
 import { createPost } from "../controllers/createPost";
 import { verifyUser } from "../middleware/verifyUser";
+import { getAllPosts } from "../controllers/getAllPosts";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -36,5 +37,7 @@ router.post(
   verifyUser,
   createPost
 );
+
+router.get("/all-posts", verifyUser, getAllPosts);
 
 export default router;
