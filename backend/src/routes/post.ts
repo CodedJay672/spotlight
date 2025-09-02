@@ -4,6 +4,7 @@ import multer from "multer";
 import { createPost } from "../controllers/createPost";
 import { verifyUser } from "../middleware/verifyUser";
 import { getAllPosts } from "../controllers/getAllPosts";
+import { toggleLikePost } from "../controllers/toggleLikePosts";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -35,5 +36,7 @@ router.post(
 );
 
 router.get("/all-posts", verifyUser, getAllPosts);
+
+router.post("/toggle-like/:id", verifyUser, toggleLikePost);
 
 export default router;

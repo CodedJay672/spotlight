@@ -4,8 +4,6 @@ import { assets, likes, posts, users } from "../db/schema";
 import { and, eq } from "drizzle-orm";
 
 export const getAllPosts = async (req: Request, res: Response) => {
-  console.log(req.id);
-
   try {
     const allPosts = await db.select().from(posts).orderBy(posts.createdAt);
 
@@ -22,6 +20,8 @@ export const getAllPosts = async (req: Request, res: Response) => {
             firstname: users.firstName,
             lastname: users.lastName,
             imgUrl: users.imgUrl,
+            username: users.userName,
+            bio: users.bio,
           })
           .from(users)
           .where(eq(users.id, post.userId));
@@ -33,7 +33,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
 
         return {
           ...post,
-          author: authorInfo,
+          author: authorInfo[0],
           imgUrl: image[0].imgUrl,
           liked: liked.length > 0,
         };
