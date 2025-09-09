@@ -1,10 +1,10 @@
-import express, { NextFunction, Request, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { checkSchema, validationResult } from "express-validator";
 import multer from "multer";
 import { createPost } from "../controllers/createPost";
-import { verifyUser } from "../middleware/verifyUser";
 import { getAllPosts } from "../controllers/getAllPosts";
 import { toggleLikePost } from "../controllers/toggleLikePosts";
+import { verifyUser } from "../middleware/verifyUser";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });

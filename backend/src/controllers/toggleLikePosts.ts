@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../db/config";
-import { likes } from "../db/schema";
+import { likes, notifications, posts } from "../db/schema";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 
@@ -9,6 +9,20 @@ export const toggleLikePost = async (req: Request, res: Response) => {
     const userId = req.id;
     const { id } = req.params;
 
+    // confirm if the post exists
+    const post = await db
+      .select({ id: posts.id, authorId: posts.userId })
+      .from(posts)
+      .where(eq(posts.id, id));
+    if (post.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+      return;
+    }
+
+    // check if post is already liked
     const liked = await db
       .select()
       .from(likes)
@@ -22,6 +36,7 @@ export const toggleLikePost = async (req: Request, res: Response) => {
         message: "unliked",
         data: false,
       });
+      return;
     }
 
     await db.insert(likes).values({
@@ -29,6 +44,15 @@ export const toggleLikePost = async (req: Request, res: Response) => {
       postId: id,
       userId,
     });
+
+    if (post?.[0].authorId !== userId) {
+      await db.insert(notifications).values({
+        id: uuidv4(),
+        authorId: post[0].authorId!,
+        userId: userId!,
+        type: "likes",
+      });
+    }
     res.status(201).json({
       success: true,
       message: "liked",

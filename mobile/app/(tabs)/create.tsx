@@ -64,17 +64,18 @@ const Create = () => {
         type,
       } as any);
     }
+
     try {
       //loading state
       setIsSharing(true);
 
       const token = await getToken();
 
-      //begin the product creation
+      //begin the post creation
       const newPost = await createPost(formData, token!);
 
       if (!newPost) {
-        Alert.alert("Failed.");
+        Alert.alert("Failed.", "Something went wrong, please try again.");
         return;
       }
 

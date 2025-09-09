@@ -22,11 +22,13 @@ export const createNewUser = async (req: Request, res: Response) => {
       .from(users)
       .where(eq(users.clerkId, id));
 
-    if (isCreated.length > 0)
+    if (isCreated.length > 0) {
       res.status(200).json({
         success: true,
         message: "logged in",
       });
+      return;
+    }
 
     // create the row in the DB
     const user = await db

@@ -27,7 +27,7 @@ export const createPost = async (postInfo: FormData, token: string) => {
 export const togglePostLike = async (postId: string, token: string) => {
   try {
     const response = await fetch(
-      `${process.env.EXPO_BASE_URL}/toggle-like/${postId}`,
+      `${process.env.EXPO_PUBLIC_BASE_URL}/post/toggle-like/${postId}`,
       {
         method: "POST",
         headers: {
@@ -39,7 +39,7 @@ export const togglePostLike = async (postId: string, token: string) => {
 
     if (!response.ok) {
       const error = await response.json();
-      return error.message as string;
+      throw error;
     }
 
     const data = (await response.json()) as TLikeResponse;

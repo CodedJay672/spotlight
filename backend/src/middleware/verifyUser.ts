@@ -19,11 +19,13 @@ export async function verifyUser(
     // get the user with the clerk id
     const { userId } = getAuth(req);
 
-    if (!userId)
+    if (!userId) {
       res.status(403).json({
         status: false,
         message: "Unauthorized",
       });
+      return;
+    }
 
     const user = await db
       .select({ id: users.id })
@@ -31,11 +33,13 @@ export async function verifyUser(
       .where(eq(users.clerkId, userId!))
       .limit(1);
 
-    if (user.length === 0)
+    if (user.length === 0) {
       res.status(404).json({
         success: false,
         message: "user not found.",
       });
+      return;
+    }
 
     req.id = user?.[0].id;
     next();
