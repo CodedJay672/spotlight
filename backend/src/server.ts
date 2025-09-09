@@ -13,6 +13,7 @@ import limiter from "./lib/config/ratelimiterconfig";
 //routes
 import postRouter from "./routes/post";
 import authRouter from "./routes/webhook";
+import commentRouter from "./routes/comments";
 
 // initialize the app
 const app = express();
@@ -30,6 +31,7 @@ app.use(limiter);
 // api endpoints
 app.use("/api/auth", authRouter);
 app.use("/api/post", postRouter);
+app.use("/api/comments", commentRouter);
 
 app.listen(config.port, () => {
   console.log("server is running on port", config.port);

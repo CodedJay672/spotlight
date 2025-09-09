@@ -40,7 +40,7 @@ const Homepage = () => {
         //display indicator while loading posts
         setLoadingPosts(true);
         const token = await getToken();
-
+        // console.log(token);
         const allPosts = await getAllPosts(token!);
         setPosts(allPosts.data);
       } catch (error: any) {
@@ -74,7 +74,7 @@ const Homepage = () => {
         data={posts}
         keyExtractor={(post) => post.id}
         renderItem={(post) => <PostCard post={post.item} />}
-        ItemSeparatorComponent={() => <View className="w-full h-3" />}
+        ItemSeparatorComponent={() => <View className="w-full h-5" />}
         ListHeaderComponent={() => (
           <View className="w-full rounded-lg overflow-hidden relative">
             <TextInput

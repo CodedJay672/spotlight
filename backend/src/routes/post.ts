@@ -26,7 +26,10 @@ router.post(
   (req: Request, res: Response, next: NextFunction) => {
     const result = validationResult(req);
 
-    if (!result.isEmpty()) res.send({ errors: result.array() });
+    if (!result.isEmpty()) {
+      res.send({ errors: result.array() });
+      return;
+    }
 
     next();
   },
@@ -36,7 +39,6 @@ router.post(
 );
 
 router.get("/all-posts", verifyUser, getAllPosts);
-
 router.post("/toggle-like/:id", verifyUser, toggleLikePost);
 
 export default router;
