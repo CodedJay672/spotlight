@@ -9,7 +9,7 @@ const router = Router();
 router.get("/:postId", verifyUser, getComments);
 
 router.post(
-  "/add-comment",
+  "/add-comment/:postId",
   checkSchema({
     postId: {
       isUUID: true,

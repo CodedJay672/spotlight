@@ -2,40 +2,15 @@ import { togglePostLike } from "@/lib/actions/post.action";
 import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 import Comments from "./Comments";
-import { getPostComments } from "@/lib/data/getPostComments";
 
 const PostCard = ({ post }: { post: TPosts }) => {
   const { getToken } = useAuth();
   const [liked, setliked] = useState(!!post.isLiked);
   const [isLiking, setIsLiking] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [allComments, setAllComments] = useState<TCommentWithDetails[]>([]);
-
-  // useEffect(() => {
-  //   const fetchComments = async () => {
-  //     try {
-  //       const token = await getToken();
-  //       if (!token) return;
-
-  //       const comments = await getPostComments(post.id, token!);
-
-  //       if (comments.status !== 200) {
-  //         Alert.alert(comments.message);
-  //         return;
-  //       }
-
-  //       setAllComments(comments.data ?? []);
-  //     } catch (error) {
-  //       if (error instanceof Error) Alert.alert(error.message);
-  //       throw error;
-  //     }
-  //   };
-
-  //   fetchComments();
-  // }, []);
 
   const handleLikePost = async () => {
     try {
@@ -58,7 +33,7 @@ const PostCard = ({ post }: { post: TPosts }) => {
 
   return (
     <View className="w-full space-y-1 rounded-lg">
-      <View className="w-full p-3 flex-row justify-between items-center">
+      <View className="w-full flex-row justify-between items-center">
         <Link href={`/profile`} asChild>
           <TouchableOpacity className="flex-row items-center gap-1">
             <View className="rounded-full overflow-hidden">
@@ -100,13 +75,16 @@ const PostCard = ({ post }: { post: TPosts }) => {
             <TouchableOpacity
               disabled={isLiking}
               onPress={handleLikePost}
-              className="p-2"
+              className="p-2 flex-row items-center gap-2"
             >
               <Ionicons
                 name={liked ? "heart" : "heart-outline"}
                 size={24}
                 color={liked ? "green" : "#fff"}
               />
+              {post.likesCount && post.likesCount > 0 && (
+                <Text className="text-base text-white">{post.likesCount}</Text>
+              )}
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => setShowModal(true)}>
@@ -122,25 +100,18 @@ const PostCard = ({ post }: { post: TPosts }) => {
         <Text className="text-base text-white font-medium">{post.content}</Text>
       </View>
 
-      <View className="w-full mt-1">
-        {!liked && (
-          <Text className="text-xs text-gray-500">
+      {!liked && (
+        <View className="w-full">
+          <Text className="text-sm text-gray-500">
             Be the first to like this post
           </Text>
-        )}
-      </View>
-
-      <View className="w-full">
-        <Text className="text-sm text-gray-300">
-          {allComments.length} comments
-        </Text>
-      </View>
+        </View>
+      )}
 
       <Comments
         showModal={showModal}
         setShowModal={setShowModal}
         postId={post.id}
-        comments={allComments}
       />
     </View>
   );

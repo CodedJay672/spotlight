@@ -1,6 +1,7 @@
 type TPosts = {
   id: string;
   content: string | null;
+  likesCount: number | null;
   isLiked: {
     id: likes.id;
     postId: likes.postId;
@@ -54,13 +55,13 @@ type TCommentWithDetails = {
   id: string;
   userId: string;
   postId: string;
-  caption: string;
+  content: string;
   createdAt: string;
   updtedAt: string;
   author: {
     id: string;
     username: string | null;
-    img: string;
+    imgUrl: string;
   };
 };
 

@@ -11,6 +11,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
       .select({
         id: posts.id,
         content: posts.caption,
+        likesCount: posts.likesCount,
         isLiked: {
           id: likes.id,
           postId: likes.postId,

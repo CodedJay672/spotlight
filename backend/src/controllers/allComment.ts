@@ -31,6 +31,12 @@ export const getComments = async (req: Request, res: Response) => {
       .from(comments)
       .innerJoin(users, eq(comments.userId, users.id))
       .where(eq(comments.postId, postId));
+
+    res.status(200).json({
+      success: true,
+      message: "comments fetched successfully",
+      data: commentWithInfo,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,

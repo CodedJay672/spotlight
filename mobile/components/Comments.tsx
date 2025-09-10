@@ -1,4 +1,4 @@
-import React, { Dispatch, useState } from "react";
+import React, { Dispatch, useCallback, useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -16,18 +17,45 @@ import {
   View,
 } from "react-native";
 import { addComment } from "@/lib/actions/comments.actions";
+import { getPostComments } from "@/lib/data/getPostComments";
+import { formatDistanceToNow } from "date-fns";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 interface Props {
   showModal: boolean;
   setShowModal: Dispatch<boolean>;
   postId: string;
-  comments: TCommentWithDetails[];
 }
 
-const Comments = ({ showModal, setShowModal, postId, comments }: Props) => {
+const Comments = ({ showModal, setShowModal, postId }: Props) => {
   const { getToken } = useAuth();
   const [sending, setSending] = useState(false);
+
   const [comment, setComment] = useState("");
+  const [allComments, setAllComments] = useState<TCommentWithDetails[]>([]);
+
+  const fetchComments = useCallback(async () => {
+    try {
+      // Clerk JWT
+      const token = await getToken();
+      if (!token) return;
+
+      // start fetching comments
+      const comments = await getPostComments(postId, token);
+      if (comments.status !== 200 || !comments.data) {
+        Alert.alert(comments.message);
+        return;
+      }
+
+      setAllComments(comments.data);
+    } catch (error) {
+      Alert.alert(error instanceof Error ? error.message : String(error));
+    }
+  }, [postId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   const handleAddComment = async () => {
     if (!postId || !comment.trim()) return;
@@ -56,13 +84,13 @@ const Comments = ({ showModal, setShowModal, postId, comments }: Props) => {
     <Modal
       animationType="slide"
       visible={showModal}
-      backdropColor="#030712"
+      transparent={true}
       onRequestClose={() => setShowModal(false)}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
-        className="w-full flex-1 space-y-2"
+        className="w-full bg-black flex-1"
       >
         <View className="flex-1 pt-6">
           <View className="w-full flex-row justify-between items-center">
@@ -76,21 +104,31 @@ const Comments = ({ showModal, setShowModal, postId, comments }: Props) => {
           </View>
 
           <FlatList
-            data={comments}
+            data={allComments}
             keyExtractor={(item) => item.id}
             ItemSeparatorComponent={() => <View className="w-full h-8" />}
             renderItem={({ item }) => (
-              <View className="w-full flex-row justify-between items-center gap-2">
-                <Image
-                  source={{ uri: item.author.img }}
-                  alt={item.author.username ?? "userlogo"}
-                  width={32}
-                  height={32}
-                  className="object-cover rounded-full"
-                />
-                <Text className="flex-1 text-sm text-gray-50 font-semibold">
-                  {item.author.username ?? "@username"}
-                </Text>
+              <View className="space-y-2">
+                <View className="w-full flex-row items-center gap-2">
+                  <Image
+                    source={{ uri: item.author.imgUrl }}
+                    alt={item.author.username ?? "user image"}
+                    width={24}
+                    height={24}
+                    className="object-cover rounded-full"
+                  />
+                  <Text className="flex-1 text-sm text-gray-400">
+                    {item.author.username ?? "@username"}
+                  </Text>
+                  <Text className="text-xs text-gray-500">
+                    {formatDistanceToNow(item.createdAt)}
+                  </Text>
+                </View>
+                <View className="w-full p-2">
+                  <Text className="text-sm text-gray-50 font-light">
+                    {item.content}
+                  </Text>
+                </View>
               </View>
             )}
             ListEmptyComponent={() => (
@@ -104,7 +142,7 @@ const Comments = ({ showModal, setShowModal, postId, comments }: Props) => {
             }}
           />
         </View>
-        <View className="w-full flex-row justify-between items-center gap-3">
+        <View className="w-full flex-row justify-between items-center gap-3 z-10">
           <TextInput
             value={comment}
             onChangeText={setComment}

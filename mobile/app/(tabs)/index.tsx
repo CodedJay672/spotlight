@@ -80,7 +80,7 @@ const Homepage = () => {
         renderItem={({ item }) => <PostCard post={item} />}
         ItemSeparatorComponent={() => <View className="w-full h-5" />}
         ListHeaderComponent={() => (
-          <View className="w-full mb-3 rounded-lg overflow-hidden relative">
+          <View className="w-full mb-5 rounded-lg overflow-hidden relative">
             <TextInput
               value={searchTerm}
               onChangeText={setSearchTerm}

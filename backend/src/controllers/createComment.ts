@@ -6,7 +6,8 @@ import { v4 as uuidv4 } from "uuid";
 
 export const createComment = async (req: Request, res: Response) => {
   const userId = req.id;
-  const { postId, content } = req.body;
+  const { content } = req.body;
+  const { postId } = req.params;
 
   try {
     // get the post detials if it exists

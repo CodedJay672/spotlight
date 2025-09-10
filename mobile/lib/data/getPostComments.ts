@@ -13,8 +13,10 @@ export const getPostComments = async (postId: string, token: string) => {
 
     //error handling
     if (!comments.ok) {
-      const error = await comments.json();
-      throw new Error(error);
+      return {
+        status: comments.status,
+        message: "couldn't get comments",
+      };
     }
 
     const data = (await comments.json()) as TGetComment;

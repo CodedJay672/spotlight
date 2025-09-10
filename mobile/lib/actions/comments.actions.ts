@@ -5,14 +5,14 @@ export const addComment = async (
 ) => {
   try {
     const response = await fetch(
-      `${process.env.EXPO_PUBLIC_BASE_URL}/comments/add-comment`,
+      `${process.env.EXPO_PUBLIC_BASE_URL}/comments/add-comment/${postId}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ postId, content }),
+        body: JSON.stringify({ content }),
       }
     );
 

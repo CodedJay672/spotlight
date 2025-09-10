@@ -18,7 +18,7 @@ export const toggleLikePost = async (req: Request, res: Response) => {
 
     // confirm if the post exists
     const post = await db
-      .select({ id: posts.id, authorId: posts.userId })
+      .select({ id: posts.id, authorId: posts.userId, likes: posts.likesCount })
       .from(posts)
       .where(eq(posts.id, id));
 
@@ -38,6 +38,12 @@ export const toggleLikePost = async (req: Request, res: Response) => {
 
     if (liked.length > 0) {
       await db.delete(likes).where(eq(likes.id, liked?.[0].id));
+      // decrease the like count for the post
+      if (post)
+        await db
+          .update(posts)
+          .set({ likesCount: post[0].likes! - 1 })
+          .where(eq(posts.id, id));
 
       return res.status(200).json({
         success: true,
@@ -52,6 +58,14 @@ export const toggleLikePost = async (req: Request, res: Response) => {
       userId,
     });
 
+    //increment the post like count
+    if (post)
+      await db
+        .update(posts)
+        .set({ likesCount: post[0].likes! + 1 })
+        .where(eq(posts.id, id));
+
+    //send out notification
     if (post?.[0].authorId !== userId) {
       await db.insert(notifications).values({
         id: uuidv4(),
