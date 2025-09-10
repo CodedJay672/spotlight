@@ -20,11 +20,10 @@ export async function verifyUser(
     const { userId } = getAuth(req);
 
     if (!userId) {
-      res.status(403).json({
+      return res.status(400).json({
         status: false,
         message: "Unauthorized",
       });
-      return;
     }
 
     const user = await db
@@ -34,16 +33,18 @@ export async function verifyUser(
       .limit(1);
 
     if (user.length === 0) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "user not found.",
       });
-      return;
     }
 
-    req.id = user?.[0].id;
+    req.id = user[0].id;
     next();
   } catch (error) {
-    throw error;
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
 }

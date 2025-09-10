@@ -30,30 +30,34 @@ const Homepage = () => {
 
       router.replace("/");
     } catch (err) {
-      console.error(JSON.stringify(err, null, 2));
+      Alert.alert(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const fetchPosts = async () => {
+    try {
+      //display indicator while loading posts
+      setLoadingPosts(true);
+      const token = await getToken();
+      if (!token) return;
+
+      // console.log(token);
+      const allPosts = await getAllPosts(token);
+      setPosts(allPosts.data);
+    } catch (error) {
+      Alert.alert(error instanceof Error ? error.message : String(error));
+      throw error;
+    } finally {
+      setLoadingPosts(false);
     }
   };
 
   useEffect(() => {
-    (async () => {
-      try {
-        //display indicator while loading posts
-        setLoadingPosts(true);
-        const token = await getToken();
-        // console.log(token);
-        const allPosts = await getAllPosts(token!);
-        setPosts(allPosts.data);
-      } catch (error: any) {
-        Alert.alert(error.message);
-        throw error;
-      } finally {
-        setLoadingPosts(false);
-      }
-    })();
+    fetchPosts();
   }, []);
 
   // loading indicator for logging out and loading posts
-  if (loggingOut || loadingPosts) {
+  if (loggingOut) {
     return (
       <View className="w-full flex-1 flex-col justify-center items-center gap-1 bg-black">
         <ActivityIndicator size="large" color="green" />
@@ -73,10 +77,10 @@ const Homepage = () => {
       <FlatList
         data={posts}
         keyExtractor={(post) => post.id}
-        renderItem={(post) => <PostCard post={post.item} />}
+        renderItem={({ item }) => <PostCard post={item} />}
         ItemSeparatorComponent={() => <View className="w-full h-5" />}
         ListHeaderComponent={() => (
-          <View className="w-full rounded-lg overflow-hidden relative">
+          <View className="w-full mb-3 rounded-lg overflow-hidden relative">
             <TextInput
               value={searchTerm}
               onChangeText={setSearchTerm}
@@ -91,8 +95,10 @@ const Homepage = () => {
             />
           </View>
         )}
+        refreshing={loadingPosts}
+        onRefresh={fetchPosts}
         ListEmptyComponent={
-          <View className="flex-1 flex-col justify-center items-center">
+          <View className="flex-1 justify-center items-center">
             <Text className="text-2xl font-semibold text-green-700">
               No posts yet!
             </Text>

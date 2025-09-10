@@ -16,6 +16,7 @@ export const getAllPosts = async (token: string) => {
     }
 
     const data = (await response.json()) as TPostsResponse;
+
     return data;
   } catch (error) {
     throw error;

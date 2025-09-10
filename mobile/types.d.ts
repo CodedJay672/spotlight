@@ -1,22 +1,23 @@
 type TPosts = {
-  status: number;
+  id: string;
+  content: string | null;
+  isLiked: {
+    id: likes.id;
+    postId: likes.postId;
+    userId: likes.userId;
+  };
   author: {
     id: string;
-    firstname: string;
+    firstName: string;
     lastname: string;
-    imgUrl: string | null;
-    username: string;
-    bio: string;
+    bio: string | null;
+    profileImg: string;
   };
-  imgUrl: string;
-  liked: boolean;
-  id: string;
-  userId: string;
-  caption: string | null;
-  allowComments: boolean | null;
-  likesCount: number | null;
+  assets: {
+    id: string;
+    imgUrl: string;
+  };
   createdAt: Date;
-  updatedAt: Date;
 };
 
 type TPostsResponse = {
@@ -31,4 +32,40 @@ type TLikeResponse = {
   success: boolean;
   message: string;
   data: boolean;
+};
+
+type TCommentResponse = {
+  id: string;
+  userId: string;
+  postId: string;
+  caption: string;
+  createdAt: string;
+  updtedAt: string;
+};
+
+type TAddCommentResponse = {
+  status: number;
+  success: boolean;
+  message: string;
+  data: TCommentResponse;
+};
+
+type TCommentWithDetails = {
+  id: string;
+  userId: string;
+  postId: string;
+  caption: string;
+  createdAt: string;
+  updtedAt: string;
+  author: {
+    id: string;
+    username: string | null;
+    img: string;
+  };
+};
+
+type TGetComment = {
+  success: true;
+  message: string;
+  data: TCommentWithDetails[];
 };

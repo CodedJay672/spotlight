@@ -9,17 +9,25 @@ export const toggleLikePost = async (req: Request, res: Response) => {
     const userId = req.id;
     const { id } = req.params;
 
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "postId is required",
+      });
+    }
+
     // confirm if the post exists
     const post = await db
       .select({ id: posts.id, authorId: posts.userId })
       .from(posts)
       .where(eq(posts.id, id));
+
+    //handle not found
     if (post.length === 0) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "Post not found",
       });
-      return;
     }
 
     // check if post is already liked
@@ -31,12 +39,11 @@ export const toggleLikePost = async (req: Request, res: Response) => {
     if (liked.length > 0) {
       await db.delete(likes).where(eq(likes.id, liked?.[0].id));
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "unliked",
         data: false,
       });
-      return;
     }
 
     await db.insert(likes).values({
@@ -59,6 +66,9 @@ export const toggleLikePost = async (req: Request, res: Response) => {
       data: true,
     });
   } catch (error) {
-    throw error;
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
 };

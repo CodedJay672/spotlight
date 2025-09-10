@@ -2,13 +2,40 @@ import { togglePostLike } from "@/lib/actions/post.action";
 import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import Comments from "./Comments";
+import { getPostComments } from "@/lib/data/getPostComments";
 
 const PostCard = ({ post }: { post: TPosts }) => {
   const { getToken } = useAuth();
-  const [liked, setliked] = useState(post.liked);
+  const [liked, setliked] = useState(!!post.isLiked);
   const [isLiking, setIsLiking] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [allComments, setAllComments] = useState<TCommentWithDetails[]>([]);
+
+  // useEffect(() => {
+  //   const fetchComments = async () => {
+  //     try {
+  //       const token = await getToken();
+  //       if (!token) return;
+
+  //       const comments = await getPostComments(post.id, token!);
+
+  //       if (comments.status !== 200) {
+  //         Alert.alert(comments.message);
+  //         return;
+  //       }
+
+  //       setAllComments(comments.data ?? []);
+  //     } catch (error) {
+  //       if (error instanceof Error) Alert.alert(error.message);
+  //       throw error;
+  //     }
+  //   };
+
+  //   fetchComments();
+  // }, []);
 
   const handleLikePost = async () => {
     try {
@@ -17,12 +44,13 @@ const PostCard = ({ post }: { post: TPosts }) => {
 
       //get the clerk JWT
       const token = await getToken();
+      if (!token) return;
 
       //start the like process
-      const liked = await togglePostLike(post.id, token!);
+      const liked = await togglePostLike(post.id, token);
       setliked(liked);
-    } catch (error: any) {
-      Alert.alert(error.message);
+    } catch (error) {
+      Alert.alert(error instanceof Error ? error.message : String(error));
     } finally {
       setIsLiking(false);
     }
@@ -35,7 +63,7 @@ const PostCard = ({ post }: { post: TPosts }) => {
           <TouchableOpacity className="flex-row items-center gap-1">
             <View className="rounded-full overflow-hidden">
               <Image
-                source={{ uri: post.author.imgUrl as string }}
+                source={{ uri: post.author.profileImg as string }}
                 width={32}
                 height={32}
                 resizeMode="contain"
@@ -43,7 +71,7 @@ const PostCard = ({ post }: { post: TPosts }) => {
             </View>
             <View className="ml-2">
               <Text className="text-base text-gray-50 font-semibold">
-                {post.author.firstname} {post.author.lastname}
+                {post.author.firstName} {post.author.lastname}
               </Text>
               <Text className="text-base text-gray-500 font-semibold truncate text-ellipsis">
                 {post.author.bio ?? "No bio"}
@@ -59,9 +87,9 @@ const PostCard = ({ post }: { post: TPosts }) => {
         <View className="w-xs h-96 overflow-hidden rounded-lg">
           <Image
             source={{
-              uri: post.imgUrl,
+              uri: post.assets.imgUrl,
             }}
-            alt={post.caption ?? "special post"}
+            alt={post.assets.id ?? "special post"}
             width={96}
             height={96}
             resizeMode="cover"
@@ -76,16 +104,22 @@ const PostCard = ({ post }: { post: TPosts }) => {
             >
               <Ionicons
                 name={liked ? "heart" : "heart-outline"}
-                size={20}
+                size={24}
                 color={liked ? "green" : "#fff"}
               />
             </TouchableOpacity>
 
-            <Ionicons name="chatbubble-outline" size={20} color="#fff" />
+            <TouchableOpacity onPress={() => setShowModal(true)}>
+              <Ionicons name="chatbubble-outline" size={20} color="#fff" />
+            </TouchableOpacity>
           </View>
 
           <Ionicons name="bookmark-outline" size={20} color="#fff" />
         </View>
+      </View>
+
+      <View className="w-full mb-2">
+        <Text className="text-base text-white font-medium">{post.content}</Text>
       </View>
 
       <View className="w-full mt-1">
@@ -95,6 +129,19 @@ const PostCard = ({ post }: { post: TPosts }) => {
           </Text>
         )}
       </View>
+
+      <View className="w-full">
+        <Text className="text-sm text-gray-300">
+          {allComments.length} comments
+        </Text>
+      </View>
+
+      <Comments
+        showModal={showModal}
+        setShowModal={setShowModal}
+        postId={post.id}
+        comments={allComments}
+      />
     </View>
   );
 };

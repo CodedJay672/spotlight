@@ -2,8 +2,11 @@ import { NextFunction, Request, Response, Router } from "express";
 import { createComment } from "../controllers/createComment";
 import { checkSchema, validationResult } from "express-validator";
 import { verifyUser } from "../middleware/verifyUser";
+import { getComments } from "../controllers/allComment";
 
 const router = Router();
+
+router.get("/:postId", verifyUser, getComments);
 
 router.post(
   "/add-comment",

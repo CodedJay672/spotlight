@@ -1,0 +1,134 @@
+import React, { Dispatch, useState } from "react";
+import { useAuth } from "@clerk/clerk-expo";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { addComment } from "@/lib/actions/comments.actions";
+
+interface Props {
+  showModal: boolean;
+  setShowModal: Dispatch<boolean>;
+  postId: string;
+  comments: TCommentWithDetails[];
+}
+
+const Comments = ({ showModal, setShowModal, postId, comments }: Props) => {
+  const { getToken } = useAuth();
+  const [sending, setSending] = useState(false);
+  const [comment, setComment] = useState("");
+
+  const handleAddComment = async () => {
+    if (!postId || !comment.trim()) return;
+
+    try {
+      setSending(true);
+
+      //get the JWT
+      const token = await getToken();
+      const commented = await addComment(postId, comment, token!);
+
+      if (commented.status !== 201) {
+        Alert.alert(commented.message);
+        return;
+      }
+
+      setComment("");
+    } catch (error) {
+      throw error;
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <Modal
+      animationType="slide"
+      visible={showModal}
+      backdropColor="#030712"
+      onRequestClose={() => setShowModal(false)}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
+        className="w-full flex-1 space-y-2"
+      >
+        <View className="flex-1 pt-6">
+          <View className="w-full flex-row justify-between items-center">
+            <Text className="text-white text-2xl font-semibold">Comments</Text>
+            <TouchableWithoutFeedback
+              onPress={() => setShowModal(false)}
+              className="p-2"
+            >
+              <Ionicons name="close-outline" size={24} color="#fff" />
+            </TouchableWithoutFeedback>
+          </View>
+
+          <FlatList
+            data={comments}
+            keyExtractor={(item) => item.id}
+            ItemSeparatorComponent={() => <View className="w-full h-8" />}
+            renderItem={({ item }) => (
+              <View className="w-full flex-row justify-between items-center gap-2">
+                <Image
+                  source={{ uri: item.author.img }}
+                  alt={item.author.username ?? "userlogo"}
+                  width={32}
+                  height={32}
+                  className="object-cover rounded-full"
+                />
+                <Text className="flex-1 text-sm text-gray-50 font-semibold">
+                  {item.author.username ?? "@username"}
+                </Text>
+              </View>
+            )}
+            ListEmptyComponent={() => (
+              <View className="flex-1 mt-20 justify-center items-center">
+                <Text className="text-lg text-gray-600">No comments yet</Text>
+              </View>
+            )}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              padding: 10,
+            }}
+          />
+        </View>
+        <View className="w-full flex-row justify-between items-center gap-3">
+          <TextInput
+            value={comment}
+            onChangeText={setComment}
+            keyboardType="twitter"
+            placeholder="Comment..."
+            placeholderTextColor="#6b7280"
+            multiline
+            className="flex-1 p-3 bg-white/10 text-gray-50 rounded-lg"
+          />
+          <TouchableOpacity
+            disabled={sending}
+            onPress={handleAddComment}
+            className="p-2 flex justify-center items-center"
+          >
+            {sending ? (
+              <ActivityIndicator size={26} color="#fff" />
+            ) : (
+              <Text className="text-base text-green-700">Post</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+};
+
+export default Comments;
