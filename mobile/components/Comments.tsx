@@ -111,8 +111,7 @@ const Comments = ({ showModal, setShowModal, postId }: Props) => {
                   <Image
                     source={{ uri: item.author.imgUrl }}
                     accessibilityLabel={item.author.username ?? "user image"}
-                    width={24}
-                    height={24}
+                    style={{ width: 32, height: 32 }}
                     className="object-cover rounded-full"
                   />
                   <Text className="flex-1 text-sm text-gray-400">

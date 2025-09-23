@@ -39,8 +39,7 @@ const PostCard = ({ post }: { post: TPosts }) => {
             <View className="rounded-full overflow-hidden">
               <Image
                 source={{ uri: post.author.profileImg as string }}
-                width={32}
-                height={32}
+                style={{ width: 32, height: 32 }}
                 resizeMode="contain"
               />
             </View>
@@ -48,7 +47,11 @@ const PostCard = ({ post }: { post: TPosts }) => {
               <Text className="text-base text-gray-50 font-semibold">
                 {post.author.firstName} {post.author.lastname}
               </Text>
-              <Text className="text-base text-gray-500 font-semibold truncate text-ellipsis">
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                className="text-base text-gray-500 font-semibold"
+              >
                 {post.author.bio ?? "No bio"}
               </Text>
             </View>
@@ -65,8 +68,7 @@ const PostCard = ({ post }: { post: TPosts }) => {
               uri: post.assets.imgUrl,
             }}
             accessibilityLabel={post.assets.id ?? "special post"}
-            width={96}
-            height={96}
+            style={{ width: "100%", height: 384 }}
             resizeMode="cover"
           />
         </View>
