@@ -41,7 +41,6 @@ const Homepage = () => {
       const token = await getToken();
       if (!token) return;
 
-      // console.log(token);
       const allPosts = await getAllPosts(token);
       setPosts(allPosts.data);
     } catch (error) {

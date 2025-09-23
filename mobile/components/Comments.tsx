@@ -110,7 +110,7 @@ const Comments = ({ showModal, setShowModal, postId }: Props) => {
                 <View className="w-full flex-row items-center gap-2">
                   <Image
                     source={{ uri: item.author.imgUrl }}
-                    alt={item.author.username ?? "user image"}
+                    accessibilityLabel={item.author.username ?? "user image"}
                     width={24}
                     height={24}
                     className="object-cover rounded-full"

@@ -64,7 +64,7 @@ const PostCard = ({ post }: { post: TPosts }) => {
             source={{
               uri: post.assets.imgUrl,
             }}
-            alt={post.assets.id ?? "special post"}
+            accessibilityLabel={post.assets.id ?? "special post"}
             width={96}
             height={96}
             resizeMode="cover"
