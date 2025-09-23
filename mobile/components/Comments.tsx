@@ -1,6 +1,9 @@
-import React, { Dispatch, useCallback, useEffect, useState } from "react";
+import { addComment } from "@/lib/actions/comments.actions";
+import { getPostComments } from "@/lib/data/getPostComments";
 import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
+import { formatDistanceToNow } from "date-fns";
+import React, { Dispatch, useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -9,17 +12,12 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { addComment } from "@/lib/actions/comments.actions";
-import { getPostComments } from "@/lib/data/getPostComments";
-import { formatDistanceToNow } from "date-fns";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 
 interface Props {
   showModal: boolean;
@@ -84,8 +82,8 @@ const Comments = ({ showModal, setShowModal, postId }: Props) => {
     <Modal
       animationType="slide"
       visible={showModal}
-      transparent={true}
       onRequestClose={() => setShowModal(false)}
+      backdropColor="#000"
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
