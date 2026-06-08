@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { db } from "../db/config";
-import { comments, users } from "../db/schema";
+import { comments } from "../db/schema";
 import { eq } from "drizzle-orm";
+import { users } from "../modules/users/schema/user";
 
 export const getComments = async (req: Request, res: Response) => {
   const { postId } = req.params;
@@ -30,7 +31,7 @@ export const getComments = async (req: Request, res: Response) => {
       })
       .from(comments)
       .innerJoin(users, eq(comments.userId, users.id))
-      .where(eq(comments.postId, postId));
+      .where(eq(comments.postId, postId as string));
 
     res.status(200).json({
       success: true,
@@ -40,8 +41,7 @@ export const getComments = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Failed to fetch comments",
-      error: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 };

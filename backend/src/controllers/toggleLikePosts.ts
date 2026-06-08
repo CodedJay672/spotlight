@@ -20,7 +20,7 @@ export const toggleLikePost = async (req: Request, res: Response) => {
     const post = await db
       .select({ id: posts.id, authorId: posts.userId, likes: posts.likesCount })
       .from(posts)
-      .where(eq(posts.id, id));
+      .where(eq(posts.id, id as string));
 
     //handle not found
     if (post.length === 0) {
@@ -34,7 +34,7 @@ export const toggleLikePost = async (req: Request, res: Response) => {
     const liked = await db
       .select()
       .from(likes)
-      .where(and(eq(likes.userId, userId!), eq(likes.postId, id)));
+      .where(and(eq(likes.userId, userId!), eq(likes.postId, id as string)));
 
     if (liked.length > 0) {
       await db.delete(likes).where(eq(likes.id, liked?.[0].id));
@@ -43,7 +43,7 @@ export const toggleLikePost = async (req: Request, res: Response) => {
         await db
           .update(posts)
           .set({ likesCount: post[0].likes! - 1 })
-          .where(eq(posts.id, id));
+          .where(eq(posts.id, id as string));
 
       return res.status(200).json({
         success: true,
@@ -54,7 +54,7 @@ export const toggleLikePost = async (req: Request, res: Response) => {
 
     await db.insert(likes).values({
       id: uuidv4(),
-      postId: id,
+      postId: id as string,
       userId,
     });
 
@@ -63,7 +63,7 @@ export const toggleLikePost = async (req: Request, res: Response) => {
       await db
         .update(posts)
         .set({ likesCount: post[0].likes! + 1 })
-        .where(eq(posts.id, id));
+        .where(eq(posts.id, id as string));
 
     //send out notification
     if (post?.[0].authorId !== userId) {
@@ -82,7 +82,7 @@ export const toggleLikePost = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? error.message : "Internal Server Error",
     });
   }
 };

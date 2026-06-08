@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { db } from "../db/config";
-import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { getAuth } from "@clerk/express";
+import { users } from "../modules/users/schema/user";
 
 declare module "express-serve-static-core" {
   interface Request {
@@ -13,12 +13,11 @@ declare module "express-serve-static-core" {
 export async function verifyUser(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     // get the user with the clerk id
     const { userId } = getAuth(req);
-
     if (!userId) {
       return res.status(400).json({
         status: false,
@@ -26,12 +25,14 @@ export async function verifyUser(
       });
     }
 
+    // get the user with the clerkId
     const user = await db
       .select({ id: users.id })
       .from(users)
       .where(eq(users.clerkId, userId!))
       .limit(1);
 
+    // handle case: users not found
     if (user.length === 0) {
       return res.status(404).json({
         success: false,
@@ -44,7 +45,7 @@ export async function verifyUser(
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? error.message : "Internal Server Error",
     });
   }
 }

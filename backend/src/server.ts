@@ -12,9 +12,10 @@ import { config } from "./lib/config/index";
 import limiter from "./lib/config/ratelimiterconfig";
 
 //routes
-import postRouter from "./routes/post";
-import authRouter from "./routes/webhook";
 import commentRouter from "./routes/comments";
+import postRouter from "./routes/post";
+import userRouter from "./modules/users/routes/users";
+import authRouter from "./config/webhook";
 
 // initialize the app
 const app = express();
@@ -33,6 +34,7 @@ app.use(limiter);
 app.use("/api/auth", authRouter);
 app.use("/api/post", postRouter);
 app.use("/api/comments", commentRouter);
+app.use("/api/user", userRouter);
 
 app.listen(config.port, () => {
   console.log("server is running on port", config.port);

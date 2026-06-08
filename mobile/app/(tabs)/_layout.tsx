@@ -11,10 +11,19 @@ const TabsLayout = () => {
         tabBarStyle: {
           backgroundColor: "black",
           borderColor: "black",
-          width: "100%",
-          height: 20,
-          paddingTop: 6,
+          width: "98%",
+          marginHorizontal: "auto",
+          height: 52,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingTop: 5,
           elevation: 50,
+          position: "absolute",
+          borderRadius: 30,
+          left: 0,
+          bottom: 0,
+
         },
       }}
     >

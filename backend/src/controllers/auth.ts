@@ -5,8 +5,8 @@ import { UserJSON } from "@clerk/express";
 import { verifyWebhook } from "@clerk/express/webhooks";
 
 import { db } from "../db/config";
-import { users } from "../db/schema";
 import { config } from "../lib/config";
+import { users } from "../modules/users/schema/user";
 
 export const createNewUser = async (req: Request, res: Response) => {
   try {
@@ -38,7 +38,7 @@ export const createNewUser = async (req: Request, res: Response) => {
         clerkId: id,
         firstName: first_name!,
         lastName: last_name!,
-        email: email_addresses?.[0].email_address,
+        email: email_addresses?.[0]?.email_address,
         phone: "",
         userName: `${username}`,
         imgUrl: image_url,

@@ -23,19 +23,10 @@ router.post(
       },
     },
   }),
-  (req: Request, res: Response, next: NextFunction) => {
-    const result = validationResult(req);
-
-    if (!result.isEmpty()) {
-      res.send({ errors: result.array() });
-      return;
-    }
-
-    next();
-  },
+  validationResult,
   upload.single("image"),
   verifyUser,
-  createPost
+  createPost,
 );
 
 router.get("/all-posts", verifyUser, getAllPosts);

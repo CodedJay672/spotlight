@@ -9,16 +9,27 @@ export const createPost = async (postInfo: FormData, token: string) => {
           Authorization: `Bearer ${token}`,
         },
         body: postInfo,
-      }
+      },
     );
 
     // error handling
     if (!response.ok) {
-      throw new Error("Something went wrong!");
+      let message = response.statusText;
+      try {
+        const errorData = await response.json();
+        if (errorData && errorData.message) message = errorData.message;
+      } catch (_) {}
+      return {
+        success: false,
+        message,
+      };
     }
 
     const data = await response.json();
-    return data;
+    return {
+      success: true,
+      post: data,
+    };
   } catch (error) {
     throw error;
   }
@@ -34,12 +45,16 @@ export const togglePostLike = async (postId: string, token: string) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
 
     if (!response.ok) {
-      const error = await response.json();
-      throw error;
+      let message = response.statusText;
+      try {
+        const errorData = await response.json();
+        if (errorData && errorData.message) message = errorData.message;
+      } catch (_) {}
+      throw { message } as Error;
     }
 
     const data = (await response.json()) as TLikeResponse;

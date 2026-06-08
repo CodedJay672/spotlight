@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { db } from "../db/config";
 import { comments, notifications, posts } from "../db/schema";
-import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
+import { eq } from "drizzle-orm";
 
 export const createComment = async (req: Request, res: Response) => {
   const userId = req.id;
@@ -14,7 +14,9 @@ export const createComment = async (req: Request, res: Response) => {
     const post = await db
       .select({ id: posts.id, authorId: posts.userId })
       .from(posts)
-      .where(eq(posts.id, postId));
+      .where(eq(posts.id, postId as string));
+
+    //handle case: post not found
     if (post.length === 0) {
       res.status(404).json({
         success: false,
@@ -27,7 +29,7 @@ export const createComment = async (req: Request, res: Response) => {
       .insert(comments)
       .values({
         id: uuidv4(),
-        postId,
+        postId: postId as string,
         userId,
         caption: content,
       })
@@ -41,7 +43,7 @@ export const createComment = async (req: Request, res: Response) => {
         userId: userId!,
         type: "comments",
         commentId: newComment[0].id,
-        postId,
+        postId: postId as string,
       });
     }
 
@@ -51,6 +53,9 @@ export const createComment = async (req: Request, res: Response) => {
       data: newComment[0],
     });
   } catch (error) {
-    throw error;
+    res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : "Internal Server Error",
+    });
   }
 };

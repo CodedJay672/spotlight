@@ -74,8 +74,8 @@ const Create = () => {
       //begin the post creation
       const newPost = await createPost(formData, token!);
 
-      if (!newPost) {
-        Alert.alert("Failed.", "Something went wrong, please try again.");
+      if (!newPost.success) {
+        Alert.alert(newPost.message || "Failed to create post.");
         return;
       }
 

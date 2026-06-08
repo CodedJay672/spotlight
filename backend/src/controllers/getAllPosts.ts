@@ -1,52 +1,54 @@
 import { Request, Response } from "express";
 import { db } from "../db/config";
-import { assets, likes, posts, users } from "../db/schema";
-import { and, eq } from "drizzle-orm";
 
 export const getAllPosts = async (req: Request, res: Response) => {
   const userId = req.id;
+  if (!userId) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized",
+    });
+  }
 
   try {
-    const allPosts = await db
-      .select({
-        id: posts.id,
-        content: posts.caption,
-        likesCount: posts.likesCount,
-        isLiked: {
-          id: likes.id,
-          postId: likes.postId,
-          userId: likes.userId,
-        },
-        author: {
-          id: users.id,
-          firstName: users.firstName,
-          lastname: users.lastName,
-          bio: users.bio,
-          profileImg: users.imgUrl,
+    const allPosts = await db.query.posts.findMany({
+      with: {
+        user: {
+          columns: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            bio: true,
+            imgUrl: true,
+          },
         },
         assets: {
-          id: assets.id,
-          imgUrl: assets.thumbnailUrl,
+          columns: {
+            id: true,
+            thumbnailUrl: true,
+          },
         },
-        createdAt: posts.createdAt,
-      })
-      .from(posts)
-      .innerJoin(users, eq(posts.userId, users.id))
-      .leftJoin(
-        likes,
-        and(eq(posts.id, likes.postId), eq(likes.userId, userId!))
-      )
-      .leftJoin(assets, eq(assets.postId, posts.id));
-
-    res.status(200).json({
-      success: true,
-      message: "Posts fetched successfully",
-      data: allPosts,
+        comments: {
+          with: {
+            user: {
+              columns: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                bio: true,
+                imgUrl: true,
+              },
+            },
+          },
+        },
+      },
     });
+
+    res.status(200).json(allPosts);
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error instanceof Error ? error.message : String(error),
+      message: error instanceof Error ? error.message : "Internal Server Error",
     });
   }
 };

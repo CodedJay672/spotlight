@@ -3,7 +3,7 @@ import { getAllPosts } from "@/lib/data/post.data";
 import { useAuth, useClerk } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -34,7 +34,7 @@ const Homepage = () => {
     }
   };
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       //display indicator while loading posts
       setLoadingPosts(true);
@@ -42,6 +42,11 @@ const Homepage = () => {
       if (!token) return;
 
       const allPosts = await getAllPosts(token);
+      if (!allPosts.success || !allPosts.data) {
+        Alert.alert(allPosts.message);
+        return;
+      }
+
       setPosts(allPosts.data);
     } catch (error) {
       Alert.alert(error instanceof Error ? error.message : String(error));
@@ -49,7 +54,7 @@ const Homepage = () => {
     } finally {
       setLoadingPosts(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchPosts();

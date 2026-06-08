@@ -1,7 +1,7 @@
 import React from "react";
 import { useSSO } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const SignIn = () => {
@@ -19,7 +19,8 @@ const SignIn = () => {
         router.replace("/(tabs)");
       }
     } catch (error) {
-      throw error;
+      Alert.alert("Sign In Failed", "An error occurred during sign-in. Please try again.");
+      console.error("Sign In Error:", error);
     }
   };
 

@@ -1,9 +1,7 @@
 import type { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { supabase } from "../db/storage";
 import { db } from "../db/config";
 import { assets, posts } from "../db/schema";
-import { eq } from "drizzle-orm";
 
 export const createPost = async (req: Request, res: Response) => {
   try {
@@ -27,39 +25,27 @@ export const createPost = async (req: Request, res: Response) => {
       const fileExt = req.file.originalname.split(".").pop();
       const fileName = `${Date.now()}.${fileExt}`;
 
-      const { error } = await supabase.storage
-        .from("spotlight-assets")
-        .upload(fileName, req.file.buffer, {
-          contentType: req.file.mimetype,
-        });
+      // upload the image to cloudinary
+      const { v2: cloudinary } = await import("cloudinary");
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        public_id: `posts/${fileName}`,
+        folder: "posts",
+      });
 
-      if (error) {
-        //delete the post if the image failed to upload
-        await db.delete(posts).where(eq(posts.id, newPost[0].id));
-        throw error;
-      }
+      imgFromStorage = uploadResult.secure_url;
 
-      const { data: publicUrl } = supabase.storage
-        .from("spotlight-assets")
-        .getPublicUrl(fileName);
-
-      imgFromStorage = publicUrl.publicUrl;
+      // save the image url to the database
       await db.insert(assets).values({
         id: uuidv4(),
         postId: newPost[0].id,
         thumbnailUrl: imgFromStorage,
       });
     }
-
-    res.status(201).json({
-      success: true,
-      message: "Post created successfully",
-      data: newPost[0],
-    });
+    res.status(201).json(newPost[0]);
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error instanceof Error ? error.message : "Internal server error",
     });
   }
 };
